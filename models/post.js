@@ -8,7 +8,8 @@ const Post = new Schema({
     title : String,
     content : String,
     views : {type:Number, default : 0},
-    author : {type:Schema.Types.ObjectId , ref:'User'}
+    author : {type:Schema.Types.ObjectId , ref:'User'},
+    like : {type:Number, default : 0},
 })
 
 Post.statics.createPost = function(item, _id){
@@ -43,6 +44,13 @@ Post.statics.updatePost = function({postid, title, content}){
     return this.updateOne(
         {postid},
         {"$set" : {title, content, modifyTime:Date.now()}}
+    );
+}
+
+Post.statics.likePost = function({postid, type}){
+    return this.updateOne(
+        {postid},
+        {$inc : {like:Number(type)}}
     );
 }
 

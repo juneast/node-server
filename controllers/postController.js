@@ -66,8 +66,9 @@ exports.delete = async (req, res) => {
             res.status(200).json({
                 "message": "Delete post successfully"
             });
+        } else {
+            throw new Error('cannot match post id');
         }
-        throw new Error('cannot match post id');
     } catch (err) {
         res.status(407).json({
             "message": err.message
@@ -85,8 +86,68 @@ exports.update = async (req, res) => {
             res.status(200).json({
                 "message": "Update post successfully"
             });
-        }
+        } else {
         throw new Error('cannot match post id');
+            
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(407).json({
+            "message": err.message
+        })
+    }
+}
+
+exports.like = async (req, res) => {
+    const {postid, type} = req.query;
+    const {postlike} = req.cookies;
+    console.log(postlike)
+    if(!postid || !type || (type!=1 && type!=-1)){
+        return res.status(400).json({
+            "message": "please check query string"
+        });
+    }
+    if (type==1 && postlike && postlike.indexOf(postid)!==-1) {     
+        return res.status(400).json({
+            "message": `cannot like same post, postid = ${postid}`
+        })
+    }
+    if (type==-1 && (!postlike || postlike.indexOf(postid)===-1)) {     
+        return res.status(400).json({
+            "message": `you didn't like this post, postid = ${postid}`
+        })
+    }
+    try {
+        const post = await Post.likePost(req.query);
+        
+        if(type==1) {
+            if (!postlike) {
+                res.cookie('postlike', [postid], {
+                    maxAge: 3600*24
+                })
+            } else {
+                res.cookie('postlike', [...postlike, postid], {
+                    maxAge: 3600*24
+                })
+            }
+        } else {
+            if(postlike) {
+                const temp = postlike.filter((item)=>{if(item!==postid) return item} );
+                const maxAge = temp.length===0? 0 : 3600*24;
+                res.cookie('postlike', temp, {
+                    maxAge
+                })
+            }
+        }
+
+        if (post.nModified) {
+            res.status(200).json({
+                "message": "Update post successfully"
+            });
+        }
+        else {
+            throw new Error('cannot match post id');
+        }
     } catch (err) {
         console.log(err);
         res.status(407).json({
