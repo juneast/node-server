@@ -2,11 +2,12 @@ const jwt = require('jsonwebtoken')
 
 const check = (req, res, next) => {
     // read the token from header or url
-    const token = req.headers['x-access-token'] || req.query.token
+    //const token = req.headers['x-access-token'] || req.query.token
+    const token = req.cookies.token;
     const client_ipaddr = req.headers['x-forwarded-for'] || req.connection.remoteAddress
 
-    console.log(req.headers);
-    console.log(token);
+    //console.log(req.headers);
+    //console.log(token);
     // token does not exist
     if(!token) {
 

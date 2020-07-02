@@ -69,6 +69,12 @@ exports.login =(req,res,next)=>{
                         subject : 'userInfo'
                     },(err,token)=>{
                         if(err) reject(err);
+                        else{
+                            res.cookie('token', token {
+                                       //maxAge:3600*24
+                                       })
+                            
+                        }
                         resolve(token);
                     });
                 })
