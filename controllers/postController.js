@@ -1,5 +1,6 @@
 const Post = require('../models/post')
 const Count = require('../models/count')
+const Like = require('../models/like')
 
 exports.save = async (req, res) => {
     const { _id } = req.decoded;
@@ -21,9 +22,26 @@ exports.save = async (req, res) => {
 }
 
 exports.getAll = async (req, res) => {
+    const { _id } = req.decoded;
     try {
-        const posts = await Post.findAllPosts();
-        res.status(200).send(posts);
+        let posts = await Post.findAllPosts();
+        const newPosts = posts.map((item) => {
+            let temp = {
+                views : item.views,
+                postid : item.postid,
+                createTime : item.createTime,
+                modifyTime :item.modifyTime,
+                title : item.title,
+                content : item.content,
+                author : item.author,
+                likes : false,
+            }
+            if(item.like.indexOf(_id)!==-1){
+                temp.likes = true;
+            }
+            return temp;
+        }) 
+        res.status(200).send(newPosts);
     } catch (err) {
         console.log(err);//DB 조회 실패시 상태코드는 무엇인가..
         res.status(407).json({
@@ -33,21 +51,21 @@ exports.getAll = async (req, res) => {
 }
 exports.getOne = async (req, res) => {
     const postid = req.params.postid;
-    if (req.cookies.postids && req.cookies.postids.indexOf(postid) !== -1) {     
+    if (req.cookies.postids && req.cookies.postids.indexOf(postid) !== -1) {
         return res.status(204).end();
     }
     try {
         const posts = await Post.increasePostViews(postid);
         if (!req.cookies.postids) {
             res.cookie('postids', [postid], {
-                maxAge: 3600*24
+                maxAge: 3600 * 24
             })
         } else {
             res.cookie('postids', [...req.cookies.postids, postid], {
-                maxAge: 3600*24
+                maxAge: 3600 * 24
             })
         }
-        
+
         res.status(200).send(posts);
     } catch (err) {
         console.log(err);//DB 조회 실패시 상태코드는 무엇인가..
@@ -66,8 +84,9 @@ exports.delete = async (req, res) => {
             res.status(200).json({
                 "message": "Delete post successfully"
             });
+        } else {
+            throw new Error('cannot match post id');
         }
-        throw new Error('cannot match post id');
     } catch (err) {
         res.status(407).json({
             "message": err.message
@@ -85,8 +104,48 @@ exports.update = async (req, res) => {
             res.status(200).json({
                 "message": "Update post successfully"
             });
+        } else {
+            throw new Error('cannot match post id');
+
         }
-        throw new Error('cannot match post id');
+    } catch (err) {
+        console.log(err);
+        res.status(407).json({
+            "message": err.message
+        })
+    }
+}
+
+exports.like = async (req, res) => {
+    const { _id: userid } = req.decoded;
+    const { postid } = req.query;
+    try {
+        const post = await Post.likePost({ postid, userid });
+        if (post.nModified) {
+            res.status(200).json({
+                "message": "Update like successfully"
+            });
+        } else {
+            throw new Error('cannot match post id');
+
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(407).json({
+            "message": err.message
+        })
+    }
+}
+exports.unlike = async (req, res) => {
+    const { _id: userid } = req.decoded;
+    const { postid } = req.query;
+    try {
+        const post = await Post.unlikePost({ postid, userid });
+        console.log(post);
+            res.status(200).json({
+                "message": "Delete like successfully"
+            });
+
     } catch (err) {
         console.log(err);
         res.status(407).json({
