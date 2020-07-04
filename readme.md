@@ -59,3 +59,19 @@ API 서버
 
     3. 댓글 삭제 (DELETE : /api/comment/commentid)
         1) url의 commentid에 해당하는 comment 삭제
+
+### #4 : ROOM 생성, 조회
+    1. 룸 등록 (POST : /api/room)
+        1) 방에 함께 등록할 유저들을 request body에
+            예시)
+            "userList" : [
+                "recode",
+                "HETBAN",
+                "LIM"
+            ]
+            함께 전송
+        2) userList 중에 유효하지 않은 아이디가 있을 시 오류
+        3) 해당 조합으로 이루어진 방이 이미 있을시 오류
+    2. 룸 조회 (GET : /api/room)
+        1) 쿠키의 userid 를 바탕으로 해당 유저의 room list 조회
+            

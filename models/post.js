@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const Schema = mongoose.SchemaTypes
 
 const Post = new Schema({
     postid : {type:Number, required : true},
@@ -9,7 +9,7 @@ const Post = new Schema({
     content : String,
     views : {type:Number, default : 0},
     author : {type:Schema.Types.ObjectId , ref:'User'},
-    like : {type:Number, default : 0},
+    like : [{type:Schema.Types.ObjectId , ref:'User'}]
 })
 
 Post.statics.createPost = function(item, _id){
@@ -25,11 +25,11 @@ Post.statics.createPost = function(item, _id){
 }
 
 Post.statics.findByPostId = function(postid) {
-    return this.findOneAndUpdate({postid});
+    return this.find({postid});
 }
 
 Post.statics.increasePostViews = function(postid) {
-    return this.findOneAndUpdate({postid},{$inc : {views:1}},{new:true});
+    return this.findOneAndUpdate({postid},{$inc : {views:1}},{new:true});    
 }
 
 Post.statics.findAllPosts = function() {
@@ -47,10 +47,17 @@ Post.statics.updatePost = function({postid, title, content}){
     );
 }
 
-Post.statics.likePost = function({postid, type}){
+Post.statics.likePost = function({postid, userid}){
     return this.updateOne(
         {postid},
-        {$inc : {like:Number(type)}}
+        {$addToSet : {like:new mongoose.Types.ObjectId(userid)}}
+    );
+}
+
+Post.statics.unlikePost = function({postid, userid}){
+    return this.updateOne(
+        {postid},
+        { $pull: { like : userid } }
     );
 }
 

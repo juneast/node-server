@@ -5,7 +5,8 @@ const check = require('../controllers/check')
 
 
 router.use(check);
-router.get('/like', postController.like);
+router.get('/like',postController.like);
+router.get('/unlike',postController.unlike);
 router.post('/', postController.save);
 router.get('/', postController.getAll)
 router.get('/:postid', postController.getOne)
