@@ -1,6 +1,5 @@
 const Post = require('../models/post')
 const Count = require('../models/count')
-const Like = require('../models/like')
 
 exports.save = async (req, res) => {
     const { _id } = req.decoded;

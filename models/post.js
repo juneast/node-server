@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const Schema = mongoose.SchemaTypes
+const Schema = mongoose.Schema
 
 const Post = new Schema({
     postid : {type:Number, required : true},

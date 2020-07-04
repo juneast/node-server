@@ -70,7 +70,7 @@ exports.login =(req,res,next)=>{
                     },(err,token)=>{
                         if(err) reject(err);
                         else{
-                            res.cookie('token', token {
+                            res.cookie('token', token ,{
                                        //maxAge:3600*24
                                        })
                             
