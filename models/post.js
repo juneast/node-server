@@ -25,15 +25,18 @@ Post.statics.createPost = function(item, _id){
 }
 
 Post.statics.findByPostId = function(postid) {
-    return this.find({postid});
+    return this.findOne({postid});
 }
 
 Post.statics.increasePostViews = function(postid) {
     return this.findOneAndUpdate({postid},{$inc : {views:1}},{new:true});    
 }
 
-Post.statics.findAllPosts = function() {
-    return this.find({}).populate('author','userId').sort("-createTime").limit(10);
+Post.statics.findAllPosts = function(last) {
+    if(last===undefined){
+        return this.find({}).populate('author','userId').sort("-createTime").limit(10);
+    }
+    return this.find({}).populate('author','userId').sort("-createTime").lt("postid",last).limit(10);
 }
 
 Post.statics.deletePost = function(postid) {

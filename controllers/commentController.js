@@ -4,15 +4,14 @@ const Post = require('../models/post')
 exports.save = async (req,res)=> {
     req.body.user_id = req.decoded._id;
     try {
-        const post = await Post.findByPostId(req.params.postid);     
+        const post = await Post.findByPostId(req.params.postid);
         req.body.post_id = post._id;
-        console.log(post._id);
         const count = await Count.getNextNum('comment');
         req.body.commentid = count.lastNum;
         const comment = await Comment.createComment(req.body);
         res.status(200).json({
             "message" : "Save comment successfully",
-            "postid" : comment.commentid
+            "commentid" : comment.commentid
         });
     } catch (err){
         console.log(err);

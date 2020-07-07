@@ -22,8 +22,10 @@ exports.save = async (req, res) => {
 
 exports.getAll = async (req, res) => {
     const { _id } = req.decoded;
+    const {last} = req.query;
+
     try {
-        let posts = await Post.findAllPosts();
+        let posts = await Post.findAllPosts(last);
         const newPosts = posts.map((item) => {
             let temp = {
                 views : item.views,
@@ -67,7 +69,7 @@ exports.getOne = async (req, res) => {
 
         res.status(200).send(posts);
     } catch (err) {
-        console.log(err);//DB 조회 실패시 상태코드는 무엇인가..
+        console.log(err);
         res.status(407).json({
             "message": "Fetch post failed"
         })
