@@ -24,6 +24,10 @@ Comment.statics.getCommentsByPostId = function(post_id) {
     return this.find({post : post_id}).populate({path:'author',select:'userId'});
 }
 
+Comment.statics.getCommentByCommentId = function(commentid) {
+    return this.findOne({commentid});
+}
+
 Comment.statics.deleteComment = function(commentid) {
     return this.deleteOne({commentid});
 }

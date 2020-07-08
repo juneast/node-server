@@ -9,7 +9,8 @@ const Post = new Schema({
     content : String,
     views : {type:Number, default : 0},
     author : {type:Schema.Types.ObjectId , ref:'User'},
-    like : [{type:Schema.Types.ObjectId , ref:'User'}]
+    like : [{type:Schema.Types.ObjectId , ref:'User'}],
+    comments : {type:Number, default : 0},
 })
 
 Post.statics.createPost = function(item, _id){
@@ -19,13 +20,24 @@ Post.statics.createPost = function(item, _id){
         modifyTime : Date.now(),
         title : item.title,
         content : item.content,
-        author : _id
+        author : _id,
+        comments : 0
     })
     return post.save();
 }
 
-Post.statics.findByPostId = function(postid) {
-    return this.findOne({postid});
+Post.statics.findByPostId = function(postid, type) {
+    if(type===undefined){
+        return this.findOne({postid});
+    }
+    else if(type==="inc"){
+        console.log("2")
+        return this.findOneAndUpdate({postid},{$inc : {comments:1}},{new:true});
+    } else {
+        console.log("3")
+        return this.findOneAndUpdate({_id:postid},{$inc : {comments:-1}},{new:true});
+    }
+    
 }
 
 Post.statics.increasePostViews = function(postid) {
@@ -63,5 +75,6 @@ Post.statics.unlikePost = function({postid, userid}){
         { $pull: { like : userid } }
     );
 }
+
 
 module.exports = mongoose.model('Post', Post)

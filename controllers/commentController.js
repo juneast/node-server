@@ -4,7 +4,7 @@ const Post = require('../models/post')
 exports.save = async (req,res)=> {
     req.body.user_id = req.decoded._id;
     try {
-        const post = await Post.findByPostId(req.params.postid);
+        const post = await Post.findByPostId(req.params.postid,"inc");
         req.body.post_id = post._id;
         const count = await Count.getNextNum('comment');
         req.body.commentid = count.lastNum;
@@ -38,13 +38,17 @@ exports.delete = async (req,res) => {
     console.log(req.params);
     const commentid = req.params.commentid;
     try {
+        const temp = await Comment.getCommentByCommentId(commentid);
         const comment = await Comment.deleteComment(commentid);
+        const post = await Post.findByPostId(temp.post,"dec");
         if(comment.deletedCount===1){
             res.status(200).json({
                 "message" : "Delete comment successfully"
             });
+        } else {
+            throw new Error('cannot match comment id');
         }
-        throw new Error('cannot match comment id');
+        
     } catch (err){
         res.status(407).json({
             "message": err.message

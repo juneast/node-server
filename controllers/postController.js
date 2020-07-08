@@ -1,6 +1,6 @@
 const Post = require('../models/post')
 const Count = require('../models/count')
-
+const Comment = require('../models/comment')
 exports.save = async (req, res) => {
     const { _id } = req.decoded;
     console.log(req.decoded);
@@ -26,7 +26,7 @@ exports.getAll = async (req, res) => {
 
     try {
         let posts = await Post.findAllPosts(last);
-        const newPosts = posts.map((item) => {
+        const newPosts = posts.map((item,index) => {
             let temp = {
                 views : item.views,
                 postid : item.postid,
@@ -36,6 +36,8 @@ exports.getAll = async (req, res) => {
                 content : item.content,
                 author : item.author,
                 likes : false,
+                likeCount : item.like.length,
+                comments : item.comments
             }
             if(item.like.indexOf(_id)!==-1){
                 temp.likes = true;
