@@ -40,8 +40,8 @@ exports.delete = async (req,res) => {
     try {
         const temp = await Comment.getCommentByCommentId(commentid);
         const comment = await Comment.deleteComment(commentid);
-        const post = await Post.findByPostId(temp.post,"dec");
         if(comment.deletedCount===1){
+            const post = await Post.findByPostId(temp.post,"dec");
             res.status(200).json({
                 "message" : "Delete comment successfully"
             });
