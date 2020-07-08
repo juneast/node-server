@@ -22,10 +22,15 @@ exports.save = async (req, res) => {
 
 exports.getAll = async (req, res) => {
     const { _id } = req.decoded;
-    const {last} = req.query;
-
+    let {last, type, tag} = req.query;
+    if(type!==undefined && type!=="views" && type!=="comments" && type!=="like"){
+        return res.status(404).json({
+            "message": "invalid query"
+        })
+    }
+    if(type==="like") type="likeCount"
     try {
-        let posts = await Post.findAllPosts(last);
+        let posts = await Post.findAllPosts(last, type, tag);
         const newPosts = posts.map((item,index) => {
             let temp = {
                 views : item.views,
@@ -36,8 +41,9 @@ exports.getAll = async (req, res) => {
                 content : item.content,
                 author : item.author,
                 likes : false,
-                likeCount : item.like.length,
-                comments : item.comments
+                likeCount : item.likeCount,
+                comments : item.comments,
+                tag : item.tag
             }
             if(item.like.indexOf(_id)!==-1){
                 temp.likes = true;
@@ -125,6 +131,7 @@ exports.like = async (req, res) => {
     try {
         const post = await Post.likePost({ postid, userid });
         if (post.nModified) {
+            await Post.updateLikeCount(postid,1);
             res.status(200).json({
                 "message": "Update like successfully"
             });
@@ -144,11 +151,14 @@ exports.unlike = async (req, res) => {
     const { postid } = req.query;
     try {
         const post = await Post.unlikePost({ postid, userid });
-        console.log(post);
+        if (post.nModified) {
+            await Post.updateLikeCount(postid, -1);
             res.status(200).json({
                 "message": "Delete like successfully"
             });
-
+        } else {
+            throw new Error('cannot match post id');
+        }
     } catch (err) {
         console.log(err);
         res.status(407).json({

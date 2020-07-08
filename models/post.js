@@ -10,7 +10,9 @@ const Post = new Schema({
     views : {type:Number, default : 0},
     author : {type:Schema.Types.ObjectId , ref:'User'},
     like : [{type:Schema.Types.ObjectId , ref:'User'}],
+    likeCount : {type:Number, default : 0},
     comments : {type:Number, default : 0},
+    tag : String
 })
 
 Post.statics.createPost = function(item, _id){
@@ -21,7 +23,8 @@ Post.statics.createPost = function(item, _id){
         title : item.title,
         content : item.content,
         author : _id,
-        comments : 0
+        comments : 0,
+        tag : item.tag
     })
     return post.save();
 }
@@ -31,10 +34,8 @@ Post.statics.findByPostId = function(postid, type) {
         return this.findOne({postid});
     }
     else if(type==="inc"){
-        console.log("2")
         return this.findOneAndUpdate({postid},{$inc : {comments:1}},{new:true});
     } else {
-        console.log("3")
         return this.findOneAndUpdate({_id:postid},{$inc : {comments:-1}},{new:true});
     }
     
@@ -44,11 +45,19 @@ Post.statics.increasePostViews = function(postid) {
     return this.findOneAndUpdate({postid},{$inc : {views:1}},{new:true});    
 }
 
-Post.statics.findAllPosts = function(last) {
-    if(last===undefined){
-        return this.find({}).populate('author','userId').sort("-createTime").limit(10);
+Post.statics.findAllPosts = function(last, type, tag) {
+    if(tag===undefined){
+        if(last===undefined){
+            return this.find({}).populate('author','userId').sort(`-${type} -createTime`).limit(10);
+        }
+        return this.find({}).populate('author','userId').sort(`-${type} -createTime`).lt("postid",last).limit(10);
+    } else {
+        if(last===undefined){
+            return this.find({tag}).populate('author','userId').sort(`-${type} -createTime`).limit(10);
+        }
+        return this.find({tag}).populate('author','userId').sort(`-${type} -createTime`).lt("postid",last).limit(10);
     }
-    return this.find({}).populate('author','userId').sort("-createTime").lt("postid",last).limit(10);
+    
 }
 
 Post.statics.deletePost = function(postid) {
@@ -73,6 +82,12 @@ Post.statics.unlikePost = function({postid, userid}){
     return this.updateOne(
         {postid},
         { $pull: { like : userid } }
+    );
+}
+Post.statics.updateLikeCount = function(postid, num){
+    return this.updateOne(
+        {postid},
+        { $inc: { likeCount : num} }
     );
 }
 
