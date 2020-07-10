@@ -59,20 +59,43 @@ exports.getAll = async (req, res) => {
     }
 }
 exports.getOne = async (req, res) => {
+    const { _id } = req.decoded;
     const postid = req.params.postid;
+    let flag = false;
     if (req.cookies.postids && req.cookies.postids.indexOf(postid) !== -1) {
-        return res.status(204).end();
+        flag = true;
     }
     try {
-        const posts = await Post.increasePostViews(postid);
-        if (!req.cookies.postids) {
-            res.cookie('postids', [postid], {
-                maxAge: 3600 * 24
-            })
+        let item;
+        if(!flag){
+            item = await Post.increasePostViews(postid);
+            if (!req.cookies.postids) {
+                res.cookie('postids', [postid], {
+                    maxAge: 3600 * 24
+                })
+            } else {
+                res.cookie('postids', [...req.cookies.postids, postid], {
+                    maxAge: 3600 * 24
+                })
+            }
         } else {
-            res.cookie('postids', [...req.cookies.postids, postid], {
-                maxAge: 3600 * 24
-            })
+            item = await Post.increasePostViews(postid,1);
+        }
+        let posts = {
+            views : item.views,
+            postid : item.postid,
+            createTime : item.createTime,
+            modifyTime :item.modifyTime,
+            title : item.title,
+            content : item.content,
+            author : item.author,
+            likes : item.like.indexOf(_id)===-1? false : true,
+            likeCount : item.likeCount,
+            comments : item.comments,
+            tag : item.tag
+        }
+        if(item.like.indexOf(_id)!==-1){
+            posts.likes = true;
         }
 
         res.status(200).send(posts);

@@ -41,7 +41,10 @@ Post.statics.findByPostId = function(postid, type) {
     
 }
 
-Post.statics.increasePostViews = function(postid) {
+Post.statics.increasePostViews = function(postid, num) {
+    if(num===1){
+        return this.findOne({postid});
+    }
     return this.findOneAndUpdate({postid},{$inc : {views:1}},{new:true});    
 }
 
