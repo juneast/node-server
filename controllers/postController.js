@@ -43,7 +43,8 @@ exports.getAll = async (req, res) => {
                 likes : false,
                 likeCount : item.likeCount,
                 comments : item.comments,
-                tag : item.tag
+                tag : item.tag,
+                isAuthor : item.author._id.toString()===_id ? true : false
             }
             if(item.like.indexOf(_id)!==-1){
                 temp.likes = true;
