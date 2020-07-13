@@ -92,7 +92,8 @@ exports.getOne = async (req, res) => {
             likes : item.like.indexOf(_id)===-1? false : true,
             likeCount : item.likeCount,
             comments : item.comments,
-            tag : item.tag
+            tag : item.tag,
+            isAuthor : item.author._id.toString()===_id ? true : false
         }
         if(item.like.indexOf(_id)!==-1){
             posts.likes = true;

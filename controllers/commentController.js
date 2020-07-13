@@ -22,10 +22,20 @@ exports.save = async (req,res)=> {
 }
 
 exports.getCommentsByPostId = async (req,res)=> {
+    const {_id} = req.decoded;
     try {
         const post = await Post.findByPostId(req.params.postid);
-        const comments = await Comment.getCommentsByPostId(post._id);
-        res.status(200).send(comments);
+        let comments = await Comment.getCommentsByPostId(post._id);
+        const abc = comments.map(item => 
+            new Object({
+                commentid : item.commentid,
+                createTime : item.createTime,
+                content : item.content,
+                author : item.author.userId,
+                isAuthor : item.author._id.toString() === _id ? true : false
+            })
+        )
+        res.status(200).send(abc);
     } catch (err){
         console.log(err);
         res.status(407).json({
