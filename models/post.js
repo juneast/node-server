@@ -67,10 +67,10 @@ Post.statics.deletePost = function(postid) {
     return this.deleteOne({postid});
 }
 
-Post.statics.updatePost = function({postid, title, content}){
+Post.statics.updatePost = function({postid, title, tag, content}){
     return this.updateOne(
         {postid},
-        {"$set" : {title, content, modifyTime:Date.now()}}
+        {"$set" : {title, content, tag, modifyTime:Date.now()}}
     );
 }
 
