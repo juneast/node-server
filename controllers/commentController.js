@@ -45,11 +45,12 @@ exports.getCommentsByPostId = async (req,res)=> {
 }
 
 exports.delete = async (req,res) => {
+    const {_id} = req.decoded;
     console.log(req.params);
     const commentid = req.params.commentid;
     try {
         const temp = await Comment.getCommentByCommentId(commentid);
-        const comment = await Comment.deleteComment(commentid);
+        const comment = await Comment.deleteComment(commentid, _id);
         if(comment.deletedCount===1){
             const post = await Post.findByPostId(temp.post,"dec");
             res.status(200).json({

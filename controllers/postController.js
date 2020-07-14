@@ -23,7 +23,7 @@ exports.save = async (req, res) => {
 exports.getAll = async (req, res) => {
     const { _id } = req.decoded;
     let {last, type, tag} = req.query;
-    if(type!==undefined && type!=="views" && type!=="comments" && type!=="like"){
+    if(type!==undefined && type!=="views" && type!=="comments" && type!=="like" && type!=="createTime"){
         return res.status(404).json({
             "message": "invalid query"
         })
@@ -108,7 +108,7 @@ exports.getOne = async (req, res) => {
         })
     }
 }
-    
+
 exports.delete = async (req, res) => {
     const { _id } = req.decoded;
     console.log(req.params);

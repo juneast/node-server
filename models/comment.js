@@ -28,8 +28,8 @@ Comment.statics.getCommentByCommentId = function(commentid) {
     return this.findOne({commentid});
 }
 
-Comment.statics.deleteComment = function(commentid) {
-    return this.deleteOne({commentid});
+Comment.statics.deleteComment = function(commentid,author) {
+    return this.deleteOne({commentid, author});
 }
 
 Comment.statics.deleteCommentByPostId = function(post_id) {
