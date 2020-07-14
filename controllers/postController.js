@@ -108,12 +108,13 @@ exports.getOne = async (req, res) => {
         })
     }
 }
-
+    
 exports.delete = async (req, res) => {
+    const { _id } = req.decoded;
     console.log(req.params);
     const postid = req.params.postid;
     try {
-        const post = await Post.deletePost(postid);
+        const post = await Post.deletePost(postid, _id);
         if (post.deletedCount === 1) {
             res.status(200).json({
                 "message": "Delete post successfully"

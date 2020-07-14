@@ -63,8 +63,8 @@ Post.statics.findAllPosts = function(last, type, tag) {
     
 }
 
-Post.statics.deletePost = function(postid) {
-    return this.deleteOne({postid});
+Post.statics.deletePost = function(postid, author) {
+    return this.deleteOne({postid, author});
 }
 
 Post.statics.updatePost = function({postid, title, tag, content}){
