@@ -53,12 +53,14 @@ Post.statics.findAllPosts = function(last, type, tag) {
         if(last===undefined){
             return this.find({}).populate('author','userId').sort(`-${type} -createTime`).limit(10);
         }
-        return this.find({}).populate('author','userId').sort(`-${type} -createTime`).lt("postid",last).limit(10);
+        if(type==="createTime") return this.find({}).populate('author','userId').sort(`-${type} -createTime`).lt("postid",last).limit(10);
+        return this.find({}).populate('author','userId').sort(`-${type} -createTime`).skip(last*10).limit(10);
     } else {
         if(last===undefined){
             return this.find({tag}).populate('author','userId').sort(`-${type} -createTime`).limit(10);
         }
-        return this.find({tag}).populate('author','userId').sort(`-${type} -createTime`).lt("postid",last).limit(10);
+        if(type==="createTime") return this.find({}).populate('author','userId').sort(`-${type} -createTime`).lt("postid",last).limit(10);
+        return this.find({}).populate('author','userId').sort(`-${type} -createTime`).skip(last*10).limit(10);
     }
     
 }
