@@ -197,22 +197,28 @@ exports.search = async (req, res) => {
     const { _id} = req.decoded;
     const { string } = req.query;
     try {
-        const item = await Post.search(string);
-        let posts = {
-            views : item.views,
-            postid : item.postid,
-            createTime : item.createTime,
-            modifyTime :item.modifyTime,
-            title : item.title,
-            content : item.content,
-            author : item.author,
-            likes : item.like.indexOf(_id)===-1? false : true,
-            likeCount : item.likeCount,
-            comments : item.comments,
-            tag : item.tag,
-            isAuthor : item.author._id.toString()===_id ? true : false
-        }
-        res.status(200).send(posts);
+        const posts = await Post.search(string);
+        const newPosts = posts.map((item,index) => {
+            let temp = {
+                views : item.views,
+                postid : item.postid,
+                createTime : item.createTime,
+                modifyTime :item.modifyTime,
+                title : item.title,
+                content : item.content,
+                author : item.author,
+                likes : false,
+                likeCount : item.likeCount,
+                comments : item.comments,
+                tag : item.tag,
+                isAuthor : item.author._id.toString()===_id ? true : false
+            }
+            if(item.like.indexOf(_id)!==-1){
+                temp.likes = true;
+            }
+            return temp;
+        }) 
+        res.status(200).send(newPosts);
     } catch (err) {
         console.log(err);
         res.status(407).json({
