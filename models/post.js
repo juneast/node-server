@@ -96,7 +96,7 @@ Post.statics.updateLikeCount = function(postid, num){
     );
 }
 Post.statics.search = function(searchItem) {
-    return this.find({$text : {$search : searchItem}})
+    return this.find({$text : {$search : searchItem}}).populate('author','userId')
 }
 
 module.exports = mongoose.model('Post', Post)
