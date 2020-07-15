@@ -192,3 +192,17 @@ exports.unlike = async (req, res) => {
         })
     }
 }
+
+exports.search = async (req, res) => {
+    const { _id} = req.decoded;
+    const { string } = req.query;
+    try {
+        const post = await Post.search(string);
+        res.status(200).send(post);
+    } catch (err) {
+        console.log(err);
+        res.status(407).json({
+            "message": err.message
+        })
+    }
+}

@@ -5,8 +5,8 @@ const Post = new Schema({
     postid : {type:Number, required : true},
     createTime : {type:Date,defalut:Date.now},
     modifyTime : Date,
-    title : String,
-    content : String,
+    title : {type : String},
+    content : {type : String},
     views : {type:Number, default : 0},
     author : {type:Schema.Types.ObjectId , ref:'User'},
     like : [{type:Schema.Types.ObjectId , ref:'User'}],
@@ -14,7 +14,7 @@ const Post = new Schema({
     comments : {type:Number, default : 0},
     tag : String
 })
-
+Post.index({ title: 'text', content: 'text' });
 Post.statics.createPost = function(item, _id){
     const post = new this({
         postid : item.postid,
@@ -95,6 +95,8 @@ Post.statics.updateLikeCount = function(postid, num){
         { $inc: { likeCount : num} }
     );
 }
-
+Post.statics.search = function(searchItem) {
+    return this.find({$text : {$search : searchItem}})
+}
 
 module.exports = mongoose.model('Post', Post)
