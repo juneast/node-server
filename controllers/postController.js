@@ -197,8 +197,22 @@ exports.search = async (req, res) => {
     const { _id} = req.decoded;
     const { string } = req.query;
     try {
-        const post = await Post.search(string);
-        res.status(200).send(post);
+        const item = await Post.search(string);
+        let posts = {
+            views : item.views,
+            postid : item.postid,
+            createTime : item.createTime,
+            modifyTime :item.modifyTime,
+            title : item.title,
+            content : item.content,
+            author : item.author,
+            likes : item.like.indexOf(_id)===-1? false : true,
+            likeCount : item.likeCount,
+            comments : item.comments,
+            tag : item.tag,
+            isAuthor : item.author._id.toString()===_id ? true : false
+        }
+        res.status(200).send(posts);
     } catch (err) {
         console.log(err);
         res.status(407).json({
