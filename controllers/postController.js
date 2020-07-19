@@ -34,28 +34,13 @@ exports.getAll = async (req, res) => {
     if(type==="like") type="likeCount"
     try {
         let posts = await Post.findAllPosts(last, type, tag);
-        const newPosts = posts.map((item,index) => {
-            let temp = {
-                views : item.views,
-                postid : item.postid,
-                createTime : item.createTime,
-                modifyTime :item.modifyTime,
-                title : item.title,
-                content : item.content,
-                author : item.author,
-                likes : false,
-                likeCount : item.likeCount,
-                comments : item.comments,
-                tag : item.tag,
-                isAuthor : item.author._id.toString()===_id ? true : false,
-                photos : item.photos
-            }
-            if(item.like.indexOf(_id)!==-1){
-                temp.likes = true;
-            }
-            return temp;
+        posts = posts.map((item,index) => {
+            item._doc.likes= item.like.indexOf(_id)===-1? false : true;
+            item._doc.isAuthor = item.author._id.toString()===_id ? true : false;
+            delete item._doc.like;
+            return item;
         }) 
-        res.status(200).send(newPosts);
+        res.status(200).send(posts);
     } catch (err) {
         console.log(err);//DB 조회 실패시 상태코드는 무엇인가..
         res.status(407).json({
@@ -76,36 +61,21 @@ exports.getOne = async (req, res) => {
             item = await Post.increasePostViews(postid);
             if (!req.cookies.postids) {
                 res.cookie('postids', [postid], {
-                    maxAge: 3600 * 24
+                    maxAge: 60000*60
                 })
             } else {
                 res.cookie('postids', [...req.cookies.postids, postid], {
-                    maxAge: 3600 * 24
+                    maxAge: 60000*60
                 })
             }
         } else {
             item = await Post.increasePostViews(postid,1);
         }
-        let posts = {
-            views : item.views,
-            postid : item.postid,
-            createTime : item.createTime,
-            modifyTime :item.modifyTime,
-            title : item.title,
-            content : item.content,
-            author : item.author,
-            likes : item.like.indexOf(_id)===-1? false : true,
-            likeCount : item.likeCount,
-            comments : item.comments,
-            tag : item.tag,
-            isAuthor : item.author._id.toString()===_id ? true : false,
-            photos : item.photos
-        }
-        if(item.like.indexOf(_id)!==-1){
-            posts.likes = true;
-        }
+        item._doc.isAuthor = item.author._id.toString()===_id ? true : false;
+        item._doc.likes= item.like.indexOf(_id)===-1? false : true;
+        delete item._doc.like;
 
-        res.status(200).send(posts);
+        res.status(200).send(item);
     } catch (err) {
         console.log(err);
         res.status(407).json({
@@ -161,8 +131,8 @@ exports.like = async (req, res) => {
     const { postid } = req.query;
     try {
         const post = await Post.likePost({ postid, userid });
+        console.log(post)
         if (post.nModified) {
-            await Post.updateLikeCount(postid,1);
             res.status(200).json({
                 "message": "Update like successfully"
             });
@@ -183,7 +153,6 @@ exports.unlike = async (req, res) => {
     try {
         const post = await Post.unlikePost({ postid, userid });
         if (post.nModified) {
-            await Post.updateLikeCount(postid, -1);
             res.status(200).json({
                 "message": "Delete like successfully"
             });
@@ -202,28 +171,14 @@ exports.search = async (req, res) => {
     const { _id} = req.decoded;
     const { string } = req.query;
     try {
-        const posts = await Post.search(string);
-        const newPosts = posts.map((item,index) => {
-            let temp = {
-                views : item.views,
-                postid : item.postid,
-                createTime : item.createTime,
-                modifyTime :item.modifyTime,
-                title : item.title,
-                content : item.content,
-                author : item.author,
-                likes : false,
-                likeCount : item.likeCount,
-                comments : item.comments,
-                tag : item.tag,
-                isAuthor : item.author._id.toString()===_id ? true : false,
-                photos : item.photos
-            }
-            if(item.like.indexOf(_id)!==-1){
-                temp.likes = true;
-            }
-            return temp;
+        let posts = await Post.search(string);
+        posts = posts.map((item,index) => {
+            item._doc.likes= item.like.indexOf(_id)===-1? false : true;
+            item._doc.isAuthor = item.author._id.toString()===_id ? true : false;
+            delete item._doc.like;
+            return item;
         }) 
+        res.status(200).send(posts);
         res.status(200).send(newPosts);
     } catch (err) {
         console.log(err);

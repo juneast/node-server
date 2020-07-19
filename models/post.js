@@ -80,23 +80,24 @@ Post.statics.updatePost = function({postid, title, tag, content}){
 
 Post.statics.likePost = function({postid, userid}){
     return this.updateOne(
-        {postid},
-        {$addToSet : {like:new mongoose.Types.ObjectId(userid)}}
+        {$and:[{postid},{like:{$ne:userid}}]},
+        {
+            $push : {like:new mongoose.Types.ObjectId(userid)},
+            $inc : {likeCount:1}
+        }
     );
 }
 
 Post.statics.unlikePost = function({postid, userid}){
     return this.updateOne(
-        {postid},
-        { $pull: { like : userid } }
+        {$and:[{postid},{like:userid}]},
+        {
+            $pull : {like:userid},
+            $inc : {likeCount:-1}
+        }
     );
 }
-Post.statics.updateLikeCount = function(postid, num){
-    return this.updateOne(
-        {postid},
-        { $inc: { likeCount : num} }
-    );
-}
+
 Post.statics.search = function(searchItem) {
     let str=""
     for(let i=0; i<searchItem.length; i++){
