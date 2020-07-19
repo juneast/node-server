@@ -1,12 +1,15 @@
 const Post = require('../models/post')
 const Count = require('../models/count')
 const Comment = require('../models/comment')
+
 exports.save = async (req, res) => {
     const { _id } = req.decoded;
-    console.log(req.decoded);
     try {
         const count = await Count.getNextNum('post');
         req.body.postid = count.lastNum;
+        req.body.files = req.files.map((item)=>{
+            return item.location;
+        });
         const post = await Post.createPost(req.body, _id);
         res.status(200).json({
             "message": "Save post successfully",
@@ -44,7 +47,8 @@ exports.getAll = async (req, res) => {
                 likeCount : item.likeCount,
                 comments : item.comments,
                 tag : item.tag,
-                isAuthor : item.author._id.toString()===_id ? true : false
+                isAuthor : item.author._id.toString()===_id ? true : false,
+                photos : item.photos
             }
             if(item.like.indexOf(_id)!==-1){
                 temp.likes = true;
@@ -94,7 +98,8 @@ exports.getOne = async (req, res) => {
             likeCount : item.likeCount,
             comments : item.comments,
             tag : item.tag,
-            isAuthor : item.author._id.toString()===_id ? true : false
+            isAuthor : item.author._id.toString()===_id ? true : false,
+            photos : item.photos
         }
         if(item.like.indexOf(_id)!==-1){
             posts.likes = true;
@@ -211,7 +216,8 @@ exports.search = async (req, res) => {
                 likeCount : item.likeCount,
                 comments : item.comments,
                 tag : item.tag,
-                isAuthor : item.author._id.toString()===_id ? true : false
+                isAuthor : item.author._id.toString()===_id ? true : false,
+                photos : item.photos
             }
             if(item.like.indexOf(_id)!==-1){
                 temp.likes = true;

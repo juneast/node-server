@@ -12,7 +12,8 @@ const Post = new Schema({
     like : [{type:Schema.Types.ObjectId , ref:'User'}],
     likeCount : {type:Number, default : 0},
     comments : {type:Number, default : 0},
-    tag : String
+    tag : String,
+    photos : [{type : String}],
 })
 Post.index({ title: 'text', content: 'text' });
 Post.statics.createPost = function(item, _id){
@@ -24,7 +25,8 @@ Post.statics.createPost = function(item, _id){
         content : item.content,
         author : _id,
         comments : 0,
-        tag : item.tag
+        tag : item.tag,
+        photos:item.files
     })
     return post.save();
 }
