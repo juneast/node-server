@@ -10,6 +10,7 @@ exports.save = async (req, res) => {
         req.body.files = req.files.map((item)=>{
             return item.location;
         });
+        console.log(req.body);
         const post = await Post.createPost(req.body, _id);
         res.status(200).json({
             "message": "Save post successfully",
