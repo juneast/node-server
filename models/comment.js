@@ -9,6 +9,7 @@ const Comment = new Schema({
     post : {type:Schema.Types.ObjectId, ref:'Post'},
     like : [{type:Schema.Types.ObjectId , ref:'User'}],
     likeCount : {type:Number, default : 0},
+    parentid : {type : Number, default : 0}
 })
 
 Comment.statics.createComment = function(item){
@@ -17,7 +18,8 @@ Comment.statics.createComment = function(item){
         createTime : Date.now(),
         content : item.content,
         author : item.user_id,
-        post : item.post_id
+        post : item.post_id,
+        parentid : item.parentid ? item.parentid : 0
     })
     return comment.save();
 }
