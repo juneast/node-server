@@ -4,9 +4,12 @@ const Schema = mongoose.Schema;
 const Comment = new Schema({
     commentid : {type:Number, required : true},
     content : String,   
-    createtime : Date,
+    createTime : {type:Date,defalut:Date.now},
     author : {type:Schema.Types.ObjectId , ref:'User'},
-    post : {type:Schema.Types.ObjectId, ref:'Post'}
+    post : {type:Schema.Types.ObjectId, ref:'Post'},
+    like : [{type:Schema.Types.ObjectId , ref:'User'}],
+    likeCount : {type:Number, default : 0},
+    parentid : {type : Number, default : 0}
 })
 
 Comment.statics.createComment = function(item){
@@ -15,7 +18,8 @@ Comment.statics.createComment = function(item){
         createTime : Date.now(),
         content : item.content,
         author : item.user_id,
-        post : item.post_id
+        post : item.post_id,
+        parentid : item.parentid ? item.parentid : 0
     })
     return comment.save();
 }
@@ -24,12 +28,35 @@ Comment.statics.getCommentsByPostId = function(post_id) {
     return this.find({post : post_id}).populate({path:'author',select:'userId'});
 }
 
-Comment.statics.deleteComment = function(commentid) {
-    return this.deleteOne({commentid});
+Comment.statics.getCommentByCommentId = function(commentid) {
+    return this.findOne({commentid});
+}
+
+Comment.statics.deleteComment = function(commentid,author) {
+    return this.deleteOne({commentid, author});
 }
 
 Comment.statics.deleteCommentByPostId = function(post_id) {
     return this.deleteMany({post:post_id});
+}
+Comment.statics.likeComment = function(commentid, userid){
+    return this.updateOne(
+        {$and:[{commentid},{like:{$ne:userid}}]},
+        {
+            $push : {like:new mongoose.Types.ObjectId(userid)},
+            $inc : {likeCount:1}
+        }
+    );
+}
+
+Comment.statics.unlikeComment = function(commentid, userid){
+    return this.updateOne(
+        {$and:[{commentid},{like:userid}]},
+        {
+            $pull : {like:userid},
+            $inc : {likeCount:-1}
+        }
+    );
 }
 
 module.exports = mongoose.model('Comment', Comment);

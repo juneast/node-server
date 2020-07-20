@@ -7,6 +7,7 @@ var user = require('./routes/user')
 var post = require('./routes/post')
 var comment = require('./routes/comment')
 var room = require('./routes/room')
+var search = require('./routes/search')
 
 var db = require('./db.js')
 var config = require('./config')
@@ -31,6 +32,7 @@ app.use('/api/user',user);
 app.use('/api/post',post);
 app.use('/api/comment', comment);
 app.use('/api/room', room);
+app.use('/api/search', search);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
