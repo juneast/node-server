@@ -179,7 +179,25 @@ exports.search = async (req, res) => {
             return item;
         }) 
         res.status(200).send(posts);
-        res.status(200).send(newPosts);
+    } catch (err) {
+        console.log(err);
+        res.status(407).json({
+            "message": err.message
+        })
+    }
+}
+
+exports.userPosts = async (req,res)=>{
+    const { _id} = req.decoded;
+    try {
+        let posts = await Post.findByUserId(_id);
+        posts = posts.map((item,index) => {
+            item._doc.likes= item.like.indexOf(_id)===-1? false : true;
+            item._doc.isAuthor = item.author._id.toString()===_id ? true : false;
+            delete item._doc.like;
+            return item;
+        }) 
+        res.status(200).send(posts);
     } catch (err) {
         console.log(err);
         res.status(407).json({

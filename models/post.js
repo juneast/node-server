@@ -42,7 +42,9 @@ Post.statics.findByPostId = function(postid, type) {
     }
     
 }
-
+Post.statics.findByUserId = function(userId) {
+    return this.find({author : userId}).populate('author','userId').exec();
+}
 Post.statics.increasePostViews = function(postid, num) {
     if(num===1){
         return this.findOne({postid}).populate('author','userId');
