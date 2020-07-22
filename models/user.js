@@ -31,7 +31,11 @@ User.statics.findOneByUserId = function(userId) {
         userId
     }).exec()
 }
-
+User.statics.findOneByObjectId = function(id) {
+    return this.findOne({
+        _id : id
+    })
+}
 // verify the password of the User documment
 User.methods.verify = function(password) {
   const encrypted = crypto.createHmac('sha1', config.secret)

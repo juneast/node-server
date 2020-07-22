@@ -2,7 +2,6 @@ const User = require('../models/user.js')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-
 exports.register = (req,res)=>{
     const {userId, password} = req.body;
     let newUser = null;
@@ -199,4 +198,19 @@ exports.mailtokencheck = (req, res, next) => {
         req.decoded = decoded
         next()
     }).catch(onError)
+}
+
+exports.getInfo = async (req,res,next)=>{
+    const {_id} = req.decoded;
+    try{
+        const result = await User.findOneByObjectId(_id);
+
+        res.status(200).json({
+            userId : result.userId
+        });
+    }catch(err){
+        res.err(404).json({
+            message:err.message,
+        })
+    }
 }
