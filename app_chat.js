@@ -4,13 +4,14 @@ var express = require('express')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server);
 
-server.listen(3000);
+server.listen(3000, ()=>{
+        console.log("server listen on 3000 port");
+});
 
 // routing
 app.get('/', function (req, res) {
 console.log("yaho!")
   res.sendfile(__dirname + '/chat.html');
-
 });
 
 // usernames which are currently connected to the chat
