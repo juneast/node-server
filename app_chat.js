@@ -5,7 +5,9 @@ var express = require('express')
   , io = require('socket.io').listen(server)
   , logger = require('morgan');
 
-
+server.listen(3000, ()=>{
+        console.log("server listen on 3000 port");
+});
 // routing
 app.use(logger('dev'));
 app.get('/', function (req, res) {
@@ -21,9 +23,7 @@ app.use(function(err, req, res, next) {
         res.status(err.status || 500);
         res.render('error');
       });
-app.listen(3000, ()=>{
-        console.log("server listen on 3000 port");
-});
+
 // usernames which are currently connected to the chat
 var usernames = {};
 
