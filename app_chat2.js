@@ -10,8 +10,9 @@ server.listen(3000, ()=>{
 
 io.on('connection', function (socket) {
         console.log("a user connected");
-        socket.on("chat message", msg =>{
+        socket.on("chat message", (msg,username) =>{
                 console.log(msg);
-                io.emit("chat message" ,msg)
+                console.log(username)
+                io.emit("chat message" ,msg,username)
         })
 });
