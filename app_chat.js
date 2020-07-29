@@ -2,18 +2,28 @@ var express = require('express')
   , app = express()
   , http = require('http')
   , server = http.createServer(app)
-  , io = require('socket.io').listen(server);
+  , io = require('socket.io').listen(server)
+  , logger = require('morgan');
 
-server.listen(3000, ()=>{
-        console.log("server listen on 3000 port");
-});
 
 // routing
+app.use(logger('dev'));
 app.get('/', function (req, res) {
 console.log("yaho!")
   res.sendfile(__dirname + '/chat.html');
 });
-
+app.use(function(err, req, res, next) {
+        // set locals, only providing error in development
+        res.locals.message = err.message;
+        res.locals.error = req.app.get('env') === 'development' ? err : {};
+      
+        // render the error page
+        res.status(err.status || 500);
+        res.render('error');
+      });
+app.listen(3000, ()=>{
+        console.log("server listen on 3000 port");
+});
 // usernames which are currently connected to the chat
 var usernames = {};
 
