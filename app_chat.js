@@ -8,7 +8,9 @@ server.listen(3000);
 
 // routing
 app.get('/', function (req, res) {
+console.log("yaho!")
   res.sendfile(__dirname + '/chat.html');
+
 });
 
 // usernames which are currently connected to the chat
