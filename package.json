@@ -7,7 +7,7 @@
     "test": "set NODE_ENV=test & mocha ./test/api.spec.js"
   },
   "dependencies": {
-    "aws-sdk": "^2.715.0",
+    "aws-sdk": "^2.814.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^8.2.0",
